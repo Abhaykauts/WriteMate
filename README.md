@@ -6,7 +6,7 @@
 
 ## 📌 Overview
 
-**WriteMate** is a portable assistive device that enables individuals with physical disabilities to **write independently** — without the need for human scribes. It captures input via **voice** or **Indian Sign Language (ISL)**, processes it using **machine learning on a Raspberry Pi 5**, and outputs the text using a **CNC machine** that physically writes it onto paper.
+**WriteMate** is a portable patent published assistive device that enables individuals with physical disabilities to **write independently** — without the need for human scribes. It captures input via **voice** or **Indian Sign Language (ISL)**, processes it using **machine learning on a Raspberry Pi 5**, and outputs the text using a **CNC machine** that physically writes it onto paper.
 
 ---
 
