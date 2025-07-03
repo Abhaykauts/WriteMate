@@ -54,3 +54,6 @@ People with disabilities such as **blindness**, **mutism**, or **non-functional 
  [ G-code Generation ]
             ↓
  [ CNC Machine Writes on Paper ]
+
+## 👋 Gesture A
+![Gesture A](Sign_Gestures/A.jpg)
