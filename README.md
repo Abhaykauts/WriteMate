@@ -1,4 +1,4 @@
-# ✍️ WriteMate
+# ✍️ WriteMate   DEMO URL: https://youtu.be/hYa2_TbZQ0w?si=911J33nuItAsphPe AT TS: 18:28
 
 > Empowering independence through assistive writing technology.
 
@@ -55,5 +55,3 @@ People with disabilities such as **blindness**, **mutism**, or **non-functional 
             ↓
  [ CNC Machine Writes on Paper ]
 
-## 👋 Gesture A
-![Gesture A](Sign_Gestures/A.jpg)
