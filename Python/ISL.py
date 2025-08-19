@@ -82,7 +82,7 @@ if train == 1:
     gestNames = []
     for i in range(numGest):
         if i < 26:
-            name = chr(65 + i)  # A-Z for alphabets
+            name = chr(65 + i)  # A-Z for alphabets    A=65
         else:
             name = str(i - 26)  # 0-9 for digits
         gestNames.append(name)
@@ -108,7 +108,7 @@ else:
 tol = 10
 gesture_string = ""
 last_gesture_time = 0  # To track the last gesture recognition time
-
+last_append_time = 0
 while True:
     ret, frame = cam.read()
     if not ret:
@@ -132,13 +132,20 @@ while True:
                 print("Training complete. Data saved.")
     elif train == 0 and handData:
         current_time = time.time()
-        if current_time - last_gesture_time > 0.5:  # Only recognize new gesture if more than 0.5 seconds have passed
+        if current_time - last_gesture_time > 0.8:
             unknownGesture = findDistances(handData[0])
             myGesture = findGesture(unknownGesture, knownGestures, keyPoints, gestNames, tol)
-            if myGesture != 'Unknown':  # Only append recognized gestures to the string
+
+            if myGesture != 'Unknown':
+                if current_time - last_append_time >= 2:
+                    gesture_string += ' '  # Add space between words
+                gesture_string += myGesture
+                last_append_time = current_time  # Update when gesture was appended
                 cv2.putText(frame, myGesture, (100, 175), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 0), 8)
-                gesture_string += myGesture  # Append recognized gesture to string
-            last_gesture_time = current_time  # Update the last gesture time
+
+            last_gesture_time = current_time  # Update when a gesture was processed
+
+            # Update the last gesture time
             print(f'Current Gesture String: {gesture_string}')
 
     for hand in handData:
@@ -146,7 +153,7 @@ while True:
             cv2.circle(frame, hand[ind], 25, (255, 0, 255), 3)  # Show tracking points
 
     cv2.imshow('my WEBcam', frame)
-    cv2.moveWindow('my WEBcam', 0, 0)
+    # cv2.moveWindow('my WEBcam', 0, 0)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

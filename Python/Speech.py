@@ -6,9 +6,7 @@ cumulative_text = ""
 
 
 def text_to_svg(text, filename="output.svg"):
-    """Function to convert text to SVG format using Hershey fonts."""
     dwg = svgwrite.Drawing(filename, profile='tiny')
-
 
     dwg.add(dwg.text(text, insert=(10, 50), fill='black', font_size=20, font_family='HersheySimplex', stroke='black',
                      stroke_width=1))
@@ -40,7 +38,7 @@ def voice_to_text():
 
 
                 if "start listening" in text or "stop listening" in text:
-                    print(f"Ignored command: {text}")
+                    print(f"Started Listening: {text}")
                     continue
 
 
