@@ -115,7 +115,7 @@ while True:
         print("Failed to grab frame")
         break
 
-    frame = cv2.resize(frame, (width, height))
+    frame = cv2.resize(frame, (width, height)) #double check
     handData = findHands.Marks(frame)
 
     if train == 1 and handData:
