@@ -97,7 +97,7 @@ const Landing = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            A smart writing tool with voice recognition and gesture control for hands-free document creation.
+            An inclusive writing assistant that turns ideas into words for individuals with speech or physical challenges.
           </motion.p>
 
           <motion.div
