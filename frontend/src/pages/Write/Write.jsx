@@ -15,17 +15,76 @@ const Write = () => {
   const { voiceEnabled, gestureEnabled, setVoiceEnabled, setGestureEnabled, darkMode } = useAuth();
   const [documentTitle, setDocumentTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
+  const [onlineMode, setOnlineMode] = useState(false);
 
   const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
   const characterCount = content.length;
   const readingTime = Math.ceil(wordCount / 200);
 
-  const toggleVoice = () => {
-    setVoiceEnabled(!voiceEnabled);
+  React.useEffect(() => {
+    let interval;
+    if (isPolling) {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch('http://127.0.0.1:5000/get-text');
+          const data = await res.json();
+          if (data.text) setContent(data.text);
+          if (!data.is_running) {
+            setIsPolling(false);
+            setVoiceEnabled(false);
+            setGestureEnabled(false);
+          }
+        } catch (err) {
+          console.error("Backend error:", err);
+        }
+      }, 500);
+    }
+    return () => clearInterval(interval);
+  }, [isPolling]);
+
+  const toggleVoice = async () => {
+    if (voiceEnabled) {
+      await fetch('http://127.0.0.1:5000/stop');
+      setVoiceEnabled(false);
+      setIsPolling(false);
+    } else {
+      const res = await fetch(`http://127.0.0.1:5000/start/voice/${onlineMode}`);
+      if (res.ok) {
+        setVoiceEnabled(true);
+        setGestureEnabled(false);
+        setIsPolling(true);
+      }
+    }
   };
 
-  const toggleGesture = () => {
-    setGestureEnabled(!gestureEnabled);
+  const toggleGesture = async () => {
+    if (gestureEnabled) {
+      await fetch('http://127.0.0.1:5000/stop');
+      setGestureEnabled(false);
+      setIsPolling(false);
+    } else {
+      const res = await fetch('http://127.0.0.1:5000/start/gesture');
+      if (res.ok) {
+        setGestureEnabled(true);
+        setVoiceEnabled(false);
+        setIsPolling(true);
+      }
+    }
+  };
+
+  const handleClear = () => {
+    if (window.confirm("Are you sure you want to clear all text?")) {
+      setContent('');
+    }
+  };
+
+  const handleReadAloud = () => {
+    if (!content) return;
+    // Cancel any ongoing speech first
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(content);
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -68,10 +127,20 @@ const Write = () => {
                       Express your ideas with voice, gestures, or keyboard
                     </p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <div className="flex items-center space-x-3">
+                    <span className={`text-sm mr-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       {wordCount} words
                     </span>
+                    <button 
+                      onClick={handleClear}
+                      className={`px-4 py-2 border rounded-full font-semibold transition-all duration-200 ${
+                        darkMode 
+                          ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                          : 'border-gray-300 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      Clear
+                    </button>
                     <button className="px-6 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-semibold hover:from-orange-600 hover:to-pink-600 transition-all duration-200">
                       Save Document
                     </button>
@@ -135,15 +204,38 @@ const Write = () => {
                   active={voiceEnabled}
                   onClick={toggleVoice}
                   icon={MicrophoneIcon}
-                  label="Start Voice"
+                  label={voiceEnabled ? "Stop Voice" : "Start Voice"}
                   enabled={true}
                   darkMode={darkMode}
                 />
+                
+                {/* Online Mode Toggle */}
+                <div className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
+                  darkMode ? 'bg-gray-700/30 border-gray-600' : 'bg-white/40 border-white/20'
+                }`}>
+                  <div className="flex items-center">
+                    <SparklesIcon className={`w-4 h-4 mr-2 ${onlineMode ? 'text-orange-500' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Online Accuracy
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setOnlineMode(!onlineMode)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      onlineMode ? 'bg-orange-500' : 'bg-gray-400'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      onlineMode ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+
                 <ControlButton
                   active={gestureEnabled}
                   onClick={toggleGesture}
                   icon={HandRaisedIcon}
-                  label="Start Gestures"
+                  label={gestureEnabled ? "Stop Gestures" : "Start Gestures"}
                   enabled={true}
                   darkMode={darkMode}
                 />
@@ -162,7 +254,12 @@ const Write = () => {
                   Quick Actions:
                 </h4>
                 <div className="space-y-2">
-                  <ActionButton icon={SpeakerWaveIcon} label="Read Aloud" darkMode={darkMode} />
+                  <ActionButton 
+                    icon={SpeakerWaveIcon} 
+                    label="Read Aloud" 
+                    onClick={handleReadAloud}
+                    darkMode={darkMode} 
+                  />
                   <ActionButton icon={SparklesIcon} label="AI Suggest" darkMode={darkMode} />
                 </div>
               </div>
@@ -244,8 +341,9 @@ const ControlButton = ({ active, onClick, icon: Icon, label, enabled, darkMode }
   </button>
 );
 
-const ActionButton = ({ icon: Icon, label, darkMode }) => (
+const ActionButton = ({ icon: Icon, label, onClick, darkMode }) => (
   <button
+    onClick={onClick}
     className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
       darkMode
         ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
