@@ -37,8 +37,20 @@ def save_to_svg(text, filename="output.svg", scale_x=1.35, scale_y=4.1, spacing=
         "W": "M0,0 L2,10 L5,5 L8,10 L10,0",
         "X": "M0,0 L10,10 M10,0 L0,10",
         "Y": "M0,0 L5,5 L10,0 M5,5 L5,10",
-        "Z": "M0,0 L10,0 L0,10 L10,10"
+        "Z": "M0,0 L10,0 L0,10 L10,10",
+        "0": "M2,0 L8,0 L10,5 L8,10 L2,10 L0,5 L2,0",
+        "1": "M3,2 L5,0 L5,10",
+        "2": "M0,2 L2,0 L8,0 L10,2 L0,10 L10,10",
+        "3": "M0,0 L10,0 L5,5 L10,10 L0,10",
+        "4": "M10,7 L0,7 M7,0 L7,10 L0,5",
+        "5": "M10,0 L0,0 L0,5 L10,5 L10,10 L0,10",
+        "6": "M10,0 L0,0 L0,10 L10,10 L10,5 L0,5",
+        "7": "M0,0 L10,0 L0,10",
+        "8": "M0,0 L10,0 L10,10 L0,10 L0,0 M0,5 L10,5",
+        "9": "M0,10 L10,10 L10,0 L0,0 L0,5 L10,5"
     }
+
+    print(f"DEBUG: Saving to SVG. Text: '{text}'")
 
     x, y = x_offset, y_offset
     line_height = 12 * scale_y + spacing
